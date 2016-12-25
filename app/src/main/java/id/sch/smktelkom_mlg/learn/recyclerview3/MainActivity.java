@@ -6,7 +6,6 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -23,7 +22,8 @@ import id.sch.smktelkom_mlg.learn.recyclerview3.model.Hotel;
 public class MainActivity extends AppCompatActivity implements HotelAdapter.IHotelAdapter {
 
     public static final String HOTEL = "hotel";
-    ArrayList<Hotel> mlist = new ArrayList<>();
+    public static final int REQUEST_CODE_ADD = 88;
+    ArrayList<Hotel> mList = new ArrayList<>();
     HotelAdapter mAdapter;
 
     @Override
@@ -37,20 +37,25 @@ public class MainActivity extends AppCompatActivity implements HotelAdapter.IHot
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
+                goAdd();
             }
         });
+
         RecyclerView recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
-        mAdapter = new HotelAdapter(this, mlist);
+        mAdapter = new HotelAdapter(this, mList);
         recyclerView.setAdapter(mAdapter);
 
-        fillData();
+        filData();
     }
 
-    private void fillData() {
+    private void goAdd() {
+        startActivityForResult(new Intent(this, InputAcivity.class), REQUEST_CODE_ADD);
+    }
+
+    private void filData() {
+
         Resources resources = getResources();
         String[] arJudul = resources.getStringArray(R.array.places);
         String[] arDeskripsi = resources.getStringArray(R.array.place_desc);
@@ -60,14 +65,19 @@ public class MainActivity extends AppCompatActivity implements HotelAdapter.IHot
         String[] arFoto = new String[a.length()];
         for (int i = 0; i < arFoto.length; i++) {
             int id = a.getResourceId(i, 0);
-            arFoto[i] = ContentResolver.SCHEME_ANDROID_RESOURCE + "://" + resources.getResourcePackageName(id) + '/' + resources.getResourceTypeName(id) + '/' + resources.getResourceEntryName(id);
+            arFoto[i] = ContentResolver.SCHEME_ANDROID_RESOURCE + "://"
+                    + resources.getResourcePackageName(id) + '/'
+                    + resources.getResourceTypeName(id) + '/'
+                    + resources.getResourceEntryName(id);
         }
         a.recycle();
 
         for (int i = 0; i < arJudul.length; i++) {
-            mlist.add(new Hotel(arJudul[i], arDeskripsi[i], arDetail[i], arLokasi[i], arFoto[i]));
+            mList.add(new Hotel(arJudul[i], arDeskripsi[i], arDetail[i],
+                    arLokasi[i], arFoto[i]));
         }
         mAdapter.notifyDataSetChanged();
+
     }
 
     @Override
@@ -95,7 +105,17 @@ public class MainActivity extends AppCompatActivity implements HotelAdapter.IHot
     @Override
     public void doClick(int pos) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(HOTEL, mlist.get(pos));
+        intent.putExtra(HOTEL, mList.get(pos));
         startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == REQUEST_CODE_ADD && resultCode == RESULT_OK) {
+            Hotel hotel = (Hotel) data.getSerializableExtra(HOTEL);
+            mList.add(hotel);
+            mAdapter.notifyDataSetChanged();
+        }
     }
 }
