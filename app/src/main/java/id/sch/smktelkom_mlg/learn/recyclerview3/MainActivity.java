@@ -23,19 +23,17 @@ import id.sch.smktelkom_mlg.learn.recyclerview3.adapter.HotelAdapter;
 import id.sch.smktelkom_mlg.learn.recyclerview3.model.Hotel;
 
 public class MainActivity extends AppCompatActivity implements HotelAdapter.IHotelAdapter {
-
     public static final String HOTEL = "hotel";
     public static final int REQUEST_CODE_ADD = 88;
     public static final int REQUEST_CODE_EDIT = 99;
     ArrayList<Hotel> mList = new ArrayList<>();
     HotelAdapter mAdapter;
-
-    int itemPos;
-
     ArrayList<Hotel> mListAll = new ArrayList<>();
     boolean isFiltered;
     ArrayList<Integer> mListMapFilter = new ArrayList<>();
     String mQuery;
+
+    int itemPos;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,7 +64,6 @@ public class MainActivity extends AppCompatActivity implements HotelAdapter.IHot
     }
 
     private void filData() {
-
         Resources resources = getResources();
         String[] arJudul = resources.getStringArray(R.array.places);
         String[] arDeskripsi = resources.getStringArray(R.array.place_desc);
@@ -88,7 +85,6 @@ public class MainActivity extends AppCompatActivity implements HotelAdapter.IHot
                     arLokasi[i], arFoto[i]));
         }
         mAdapter.notifyDataSetChanged();
-
     }
 
     @Override
@@ -126,7 +122,7 @@ public class MainActivity extends AppCompatActivity implements HotelAdapter.IHot
         }
 
         mList.clear();
-        if (query.isEmpty()) {
+        if (query == null || query.isEmpty()) {
             mList.addAll(mListAll);
             isFiltered = false;
         } else {
